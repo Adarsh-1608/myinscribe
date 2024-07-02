@@ -21,9 +21,9 @@ This repository contains a content generation and optimization application using
 ## Cloning the Repository:
 First, clone the repository to your local machine:<br/>
     
-    git clone https://github.com/tanishakarmakar/MyInscribe-Content-Craft.git 
+    git clone https://github.com/Adarsh-1608/myinscribe.git 
      <br/>
-     cd MyInscribe-Content-Craft/backend
+     cd myinscribe/backend
     
 ## Creating a Virtual Environment
 Create and activate a virtual environment:  
@@ -55,7 +55,7 @@ python run.py #start the backend server
 If the path to the Llama model changes, update it in backend/app/ai.py, line 11
 
 # Run the frontend
-Go to the MyInscribe-Content-Craft/frontend directory and run this command:  
+Go to the myinscribe/frontend directory and run this command:  
 npm start
 
 # You are Ready!
