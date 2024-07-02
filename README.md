@@ -22,7 +22,7 @@ This repository contains a content generation and optimization application using
 First, clone the repository to your local machine:<br/>
     
     git clone https://github.com/Adarsh-1608/myinscribe.git 
-     <br/>
+     
      cd myinscribe/backend
     
 ## Creating a Virtual Environment
