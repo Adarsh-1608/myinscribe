@@ -8,7 +8,7 @@ from llama_cpp import Llama
 
 # Initialize Llama model
 llm = Llama(
-    model_path="./models/7B/llama-2-7b-chat.Q4_K_M.gguf",
+    model_path="./models/7B/llama-2-7b-chat.Q4_K_M.gguf", #Edit your llama model path here.
     n_gpu_layers=50
 )
 
