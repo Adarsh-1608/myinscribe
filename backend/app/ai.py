@@ -4,13 +4,15 @@ from textstat import textstat
 from collections import Counter
 import re
 import language_tool_python
-from llama_cpp import Llama
+import os
+from groq import Groq
+from dotenv import load_dotenv
 
-# Initialize Llama model
-llm = Llama(
-    model_path="./models/7B/llama-2-7b-chat.Q4_K_M.gguf", #Edit your llama model path here.
-    n_gpu_layers=50
-)
+# Load environment variables from .env file
+load_dotenv()
+
+# Initialize Groq client
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -21,49 +23,24 @@ summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 # Initialize LanguageTool
 tool = language_tool_python.LanguageTool('en-US')
 
-def generate_content(prompt, max_tokens=512, chunk_size=100, stop_sequences=["Q:", "\n"], context_window=512):
-    response_text = ""
-    total_tokens = 0
-    prompt_tokens = len(prompt.split())
-
-    if prompt_tokens >= context_window:
-        # Truncate the prompt to fit within the context window
-        prompt_tokens = context_window - 1
-        prompt = ' '.join(prompt.split()[:prompt_tokens])
-
-    max_tokens = min(max_tokens, context_window - prompt_tokens)
-
-    while total_tokens < max_tokens:
-        available_tokens = context_window - prompt_tokens - total_tokens
-        if available_tokens <= 0:
-            break
-
-        current_chunk_size = min(chunk_size, available_tokens)
-
-        response = llm(
-            prompt + response_text,
-            max_tokens=current_chunk_size,
-            stop=stop_sequences
+def generate_content(prompt, max_tokens=512, model="llama3-8b-8192"):
+    try:
+        # Create chat completion request
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model=model,
         )
-
-        chunk = response['choices'][0]['text'].strip()
-        chunk_tokens = len(chunk.split())
-        total_tokens += chunk_tokens
-
-        if total_tokens >= max_tokens:
-            last_period_index = chunk.rfind('.')
-            if last_period_index != -1:
-                chunk = chunk[:last_period_index + 1]
-            else:
-                chunk = chunk.rstrip('.!?,')
-        
-        response_text += " " + chunk
-
-        if response_text.strip()[-1] in ['.', '!', '?']:
-            break
-
-    return response_text.strip()
-
+        # Extract the content from the response
+        response_text = chat_completion.choices[0].message.content
+        return response_text.strip()
+    except Exception as e:
+        print(f"Error generating content: {e}")
+        return None
 
 def optimize_content(text):
     summary = summarizer(text, max_length=150, min_length=50, do_sample=False)
